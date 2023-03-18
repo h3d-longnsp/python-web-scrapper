@@ -46,24 +46,25 @@ def getURLFromPage(pageHtml: str, pattern: str) -> list[str]:
     return [HOMEPAGE + url for url in unique_urls if len(url) > 40]
 
 def getPageContent(url: str) -> tuple[str, str]:
-    """ Retrieves the HTML content of a webpage using the provided URL, extracts the text from
-    all paragraph tags in the HTML, and returns a tuple containing the text and the datetime
-    attribute of the first time tag found in the HTML.
+    """ Retrieves the HTML content of a webpage using the provided URL, extracts the text from 
+    the heading tag and all paragraph tags in the HTML, and returns a tuple containing the text 
+    and the `datetime` attribute of the first time tag found in the HTML.
 
     Args:
-        url (str): The URL of the webpage to retrieve.
+        `url` (str): The URL of the webpage to retrieve.
 
     Returns:
         tuple[str, str]: A tuple containing two strings:
         
-        - The concatenated text of all paragraph tags in the HTML content.
+        - The concatenated text of the heading and all paragraph tags in the HTML content.
         - The value of the datetime attribute of the first time tag found in the HTML content.
         If no paragraphs are found in the HTML content, an empty string is returned for both values.
     """
     soup = BeautifulSoup(requests.get(url).content, "html.parser")
+    heading = soup.find('h3')
     paragraphs = soup.find_all("p")
     time = soup.find("time")
-    return (getText(paragraphs), time.get("datetime")) if paragraphs else ("", "")
+    return (heading.text + " " + getText(paragraphs), time.get("datetime")) if paragraphs else ("", "")
     
 def urlRegex(source: str) -> str:
     """ Using regex to extract source url
@@ -73,10 +74,10 @@ def urlRegex(source: str) -> str:
     the match object.
     
     Args:
-        source (str): The string to search for the unique URL pattern..
+        `source` (str): The string to search for the unique URL pattern..
         
     Returns:
-        source_url (str): Source url of the post, or an empty string if no
+        `source_url` (str): Source url of the post, or an empty string if no
         pattern is found.
     """
     try:
@@ -90,15 +91,15 @@ def jsonFormatter(url: list, content: list, date: list):
     suitable for conversion to JSON. Filters out any tuples where any of the elements are empty strings.
 
     Args:
-        url (list): A list of URL strings.
-        content (list): A list of content strings.
-        date (list): A list of date strings.
+        `url` (list): A list of URL strings.
+        `content` (list): A list of content strings.
+        `date` (list): A list of date strings.
 
     Returns:
         list[dict]: A list of dictionaries, each dictionary has three keys:
-        - "url": The URL string from the corresponding index of the `url` list.
-        - "content": The content string from the corresponding index of the `content` list.
-        - "date": The date string from the corresponding index of the `date` list.
+        - `url`: The URL string from the corresponding index of the `url` list.
+        - `content`: The content string from the corresponding index of the `content` list.
+        - `date`: The date string from the corresponding index of the `date` list.
     """
     keys = ["url", "content", "date"] 
     tmp = list(zip(url, content, date))
@@ -110,14 +111,15 @@ def jsonFormatter(url: list, content: list, date: list):
 def writeFile(filename: str, data: list[dict]):
     """ Write json-formatted data to `*.json` file.
      
-    Set `ensure_ascii=False` to make `json.dump` leave encoding to file object.
+    Set `ensure_ascii`=`False` to make `json.dump` leave encoding to file object.
 
     Args:
-        filename (str): _description_
-        data (list[dict]): _description_
+        `filename` (str): path to filename
+        `data` (list[dict]): json-formatted data
     """
     with open(filename, 'w', encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
-        print("Json file created!")
+        print(f"{filename} created!")
         
     f.close
+    

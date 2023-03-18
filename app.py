@@ -9,7 +9,7 @@ posts_unique_url = []
 
 def parser():
     parser = argparse.ArgumentParser(description='Python web scrapper.')
-    parser.add_argument("-c", "--category", help="Category to scrape.", default="khoa-hoc.")
+    parser.add_argument("-c", "--category", help="Category to scrape.", default="khoa-hoc")
     return parser.parse_args()    
 
 def main():
@@ -28,7 +28,7 @@ def main():
 
     jsonData = utils.jsonFormatter(posts_unique_url, posts_content, posts_date)
 
-    utils.writeFile("NguyenSyPhiLong.json", jsonData) 
+    utils.writeFile(f"NSPL-{args.category}.json", jsonData) 
 
 if __name__ == "__main__":
     main()

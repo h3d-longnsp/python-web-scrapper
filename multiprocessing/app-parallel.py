@@ -1,10 +1,9 @@
 import sys
- 
 # setting path
 sys.path.append('../regex-scrapper/')
 
-import utils
 import multiprocessing
+from utils import getPageResponse, getURLFromPage, getPageContent, urlRegex, jsonFormatter, writeFile
 
 URL_REGEX = r'href="(\/\S*?.epi)"'
 
@@ -14,25 +13,25 @@ def scrape_category(category):
     posts_unique_url = []
 
     category_url = f"https://baomoi.com/{category}.epi"
-    html = utils.getPageResponse(category_url)
-    posts_url = utils.getURLFromPage(html, URL_REGEX)
+    html = getPageResponse(category_url)
+    posts_url = getURLFromPage(html, URL_REGEX)
 
     for url in posts_url:
-        body, date = utils.getPageContent(url)
+        body, date = getPageContent(url)
         posts_content.append(body)
         posts_date.append(date)
 
     for content in posts_content:
-        posts_unique_url.append(utils.urlRegex(content))
+        posts_unique_url.append(urlRegex(content))
 
-    jsonData = utils.jsonFormatter(posts_unique_url, posts_content, posts_date)
-    utils.writeFile(f"./multiprocessing/output/{category}.json", jsonData)
+    jsonData = jsonFormatter(posts_unique_url, posts_content, posts_date)
+    writeFile(f"./multiprocessing/output/{category}.json", jsonData)
 
 if __name__ == "__main__":
-    categories = ["giao-duc", "khoa-hoc", "giai-tri", "kinh-te"]
+    categories = ["giao-duc", "khoa-hoc-cong-nghe", "khoa-hoc", "giai-tri", "kinh-te", "nha-dat"]
 
-    # Create a process pool with 4 workers
-    pool = multiprocessing.Pool(processes=4)
+    # Create a process pool with 6 workers
+    pool = multiprocessing.Pool(processes=6)
 
     # Map the scrape_category function to each category in parallel
     pool.map(scrape_category, categories)
