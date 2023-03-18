@@ -1,3 +1,8 @@
+import sys
+ 
+# setting path
+sys.path.append('../regex-scrapper/')
+
 import utils
 import multiprocessing
 
@@ -8,21 +13,20 @@ def scrape_category(category):
     posts_content = []
     posts_unique_url = []
 
-    for page_num in range(1, 10):
-        category_url = f"https://baomoi.com/{category}/trang{page_num}.epi"
-        html = utils.getPageResponse(category_url)
-        posts_url = utils.getURLFromPage(html, URL_REGEX)
+    category_url = f"https://baomoi.com/{category}.epi"
+    html = utils.getPageResponse(category_url)
+    posts_url = utils.getURLFromPage(html, URL_REGEX)
 
-        for url in posts_url:
-            body, date = utils.getPageContent(url)
-            posts_content.append(body)
-            posts_date.append(date)
+    for url in posts_url:
+        body, date = utils.getPageContent(url)
+        posts_content.append(body)
+        posts_date.append(date)
 
-        for content in posts_content:
-            posts_unique_url.append(utils.urlRegex(content))
+    for content in posts_content:
+        posts_unique_url.append(utils.urlRegex(content))
 
     jsonData = utils.jsonFormatter(posts_unique_url, posts_content, posts_date)
-    utils.writeFile(f"{category}.json", jsonData)
+    utils.writeFile(f"./multiprocessing/output/{category}.json", jsonData)
 
 if __name__ == "__main__":
     categories = ["giao-duc", "khoa-hoc", "giai-tri", "kinh-te"]
